@@ -1,0 +1,976 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grand Teal Hotel — Sistem Manajemen</title>
+    <meta name="description" content="Grand Teal Hotel - Pengalaman menginap mewah di jantung kota. Reservasi online 24 jam.">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700;900&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --teal-50:#f0fdfa;--teal-100:#ccfbf1;--teal-200:#99f6e4;--teal-300:#5eead4;
+            --teal-400:#2dd4bf;--teal-500:#14b8a6;--teal-600:#0d9488;--teal-700:#0f766e;
+            --teal-800:#115e59;--teal-900:#134e4a;--teal-950:#042f2e;
+            --white:#ffffff;--gray-50:#f8fafc;--gray-100:#f1f5f9;--gray-200:#e2e8f0;
+            --gray-300:#cbd5e1;--gray-400:#94a3b8;--gray-500:#64748b;--gray-600:#475569;
+            --gray-700:#334155;--gray-800:#1e293b;--gray-900:#0f172a;
+            --gold:#d4a853;--gold-light:#f5e6c8;--danger:#ef4444;--success:#22c55e;--warning:#f59e0b;
+        }
+        *{margin:0;padding:0;box-sizing:border-box;}
+        body{font-family:'DM Sans',sans-serif;background:var(--gray-50);color:var(--gray-800);overflow-x:hidden;}
+        .font-display{font-family:'Playfair Display',serif;}
+        ::-webkit-scrollbar{width:6px;}::-webkit-scrollbar-track{background:var(--gray-100);}
+        ::-webkit-scrollbar-thumb{background:var(--teal-300);border-radius:3px;}
+        ::-webkit-scrollbar-thumb:hover{background:var(--teal-500);}
+
+        /* === ANIMASI === */
+        @keyframes fadeInUp{from{opacity:0;transform:translateY(30px);}to{opacity:1;transform:translateY(0);}}
+        @keyframes fadeIn{from{opacity:0;}to{opacity:1;}}
+        @keyframes slideRight{from{opacity:0;transform:translateX(20px);}to{opacity:1;transform:translateX(0);}}
+        @keyframes scaleIn{from{opacity:0;transform:scale(0.92);}to{opacity:1;transform:scale(1);}}
+        @keyframes float{0%,100%{transform:translateY(0);}50%{transform:translateY(-10px);}}
+        @keyframes slideDown{from{opacity:0;transform:translateY(-10px);}to{opacity:1;transform:translateY(0);}}
+        @keyframes barGrow{from{transform:scaleY(0);}to{transform:scaleY(1);}}
+        @keyframes pulseDot{0%,100%{opacity:1;transform:scale(1);}50%{opacity:.5;transform:scale(1.5);}}
+        .anim-up{animation:fadeInUp .6s ease-out forwards;}
+        .anim-in{animation:fadeIn .5s ease-out forwards;}
+        .anim-right{animation:slideRight .4s ease-out forwards;}
+        .anim-scale{animation:scaleIn .3s ease-out forwards;}
+        .anim-float{animation:float 3s ease-in-out infinite;}
+        .anim-down{animation:slideDown .4s ease-out forwards;}
+        .d1{animation-delay:.1s;opacity:0;}.d2{animation-delay:.2s;opacity:0;}
+        .d3{animation-delay:.3s;opacity:0;}.d4{animation-delay:.4s;opacity:0;}
+        .d5{animation-delay:.5s;opacity:0;}.d6{animation-delay:.6s;opacity:0;}
+
+        /* === SIDEBAR ADMIN === */
+        .sidebar{width:260px;min-height:100vh;background:linear-gradient(180deg,var(--teal-950),var(--teal-900));transition:all .3s cubic-bezier(.4,0,.2,1);position:fixed;left:0;top:0;z-index:40;overflow-y:auto;}
+        .sidebar.collapsed{width:72px;}
+        .sidebar.collapsed .slbl,.sidebar.collapsed .sbrand,.sidebar.collapsed .stitle{display:none;}
+        .sidebar.collapsed .sitem{justify-content:center;padding-left:0;padding-right:0;}
+        .sidebar.collapsed .sitem i{margin-right:0;}
+        .sitem{display:flex;align-items:center;padding:10px 20px;color:var(--teal-200);cursor:pointer;transition:all .2s;border-radius:8px;margin:2px 10px;font-size:14px;font-weight:500;}
+        .sitem:hover{background:rgba(255,255,255,.08);color:#fff;}
+        .sitem.active{background:linear-gradient(135deg,var(--teal-600),var(--teal-500));color:#fff;box-shadow:0 4px 12px rgba(20,184,166,.3);}
+        .sitem i{width:20px;text-align:center;margin-right:12px;font-size:15px;}
+        .mcontent{margin-left:260px;transition:margin-left .3s cubic-bezier(.4,0,.2,1);min-height:100vh;}
+        .mcontent.exp{margin-left:72px;}
+
+        /* === KARTU === */
+        .card{background:#fff;border-radius:14px;border:1px solid var(--gray-100);box-shadow:0 1px 3px rgba(0,0,0,.04);transition:all .25s;}
+        .card:hover{box-shadow:0 8px 25px rgba(0,0,0,.06);}
+        .card-el{box-shadow:0 4px 20px rgba(0,0,0,.06),0 1px 3px rgba(0,0,0,.04);}
+
+        /* === TOMBOL === */
+        .btn-t{background:linear-gradient(135deg,var(--teal-600),var(--teal-500));color:#fff;border:none;padding:10px 22px;border-radius:10px;font-weight:600;font-size:14px;cursor:pointer;transition:all .25s;display:inline-flex;align-items:center;gap:8px;font-family:'DM Sans',sans-serif;}
+        .btn-t:hover{background:linear-gradient(135deg,var(--teal-700),var(--teal-600));transform:translateY(-1px);box-shadow:0 6px 20px rgba(13,148,136,.3);}
+        .btn-t:active{transform:translateY(0);}
+        .btn-t:disabled{opacity:.5;cursor:not-allowed;transform:none;box-shadow:none;}
+        .btn-o{background:transparent;color:var(--teal-600);border:2px solid var(--teal-300);padding:8px 20px;border-radius:10px;font-weight:600;font-size:14px;cursor:pointer;transition:all .25s;display:inline-flex;align-items:center;gap:8px;font-family:'DM Sans',sans-serif;}
+        .btn-o:hover{background:var(--teal-50);border-color:var(--teal-500);}
+        .btn-d{background:linear-gradient(135deg,var(--danger),#dc2626);color:#fff;border:none;padding:8px 18px;border-radius:8px;font-weight:600;font-size:13px;cursor:pointer;transition:all .2s;font-family:'DM Sans',sans-serif;}
+        .btn-d:hover{transform:translateY(-1px);box-shadow:0 4px 12px rgba(239,68,68,.3);}
+        .btn-g{background:transparent;color:var(--gray-500);border:none;padding:6px 12px;border-radius:8px;font-size:13px;cursor:pointer;transition:all .2s;font-family:'DM Sans',sans-serif;}
+        .btn-g:hover{background:var(--gray-100);color:var(--gray-700);}
+
+        /* === INPUT === */
+        .ipt{width:100%;padding:10px 14px;border:1.5px solid var(--gray-200);border-radius:10px;font-size:14px;font-family:'DM Sans',sans-serif;transition:all .2s;background:#fff;color:var(--gray-800);}
+        .ipt:focus{outline:none;border-color:var(--teal-400);box-shadow:0 0 0 3px rgba(20,184,166,.1);}
+        .ipt::placeholder{color:var(--gray-400);}
+        select.ipt{cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:36px;}
+
+        /* === BADGE === */
+        .badge{display:inline-flex;align-items:center;padding:4px 12px;border-radius:20px;font-size:11px;font-weight:600;letter-spacing:.02em;white-space:nowrap;}
+        .b-avail{background:#dcfce7;color:#16a34a;}.b-booked{background:#fee2e2;color:#dc2626;}
+        .b-conf{background:#dbeafe;color:#2563eb;}.b-cancel{background:#fef3c7;color:#d97706;}
+        .b-checkin{background:#e0e7ff;color:#4f46e5;}.b-checkout{background:#f0fdf4;color:#15803d;}
+
+        /* === TABEL === */
+        .dtable{width:100%;border-collapse:separate;border-spacing:0;}
+        .dtable thead th{background:var(--teal-50);color:var(--teal-800);font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:.06em;padding:12px 14px;text-align:left;border-bottom:2px solid var(--teal-100);}
+        .dtable thead th:first-child{border-radius:10px 0 0 0;}.dtable thead th:last-child{border-radius:0 10px 0 0;}
+        .dtable tbody tr{transition:background .15s;}.dtable tbody tr:hover{background:var(--gray-50);}
+        .dtable tbody td{padding:11px 14px;border-bottom:1px solid var(--gray-100);font-size:13px;color:var(--gray-700);}
+
+        /* === TOAST === */
+        .toast-c{position:fixed;top:20px;right:20px;z-index:9999;display:flex;flex-direction:column;gap:10px;}
+        .toast{padding:14px 20px;border-radius:12px;color:#fff;font-weight:500;font-size:14px;display:flex;align-items:center;gap:10px;box-shadow:0 8px 25px rgba(0,0,0,.15);animation:slideRight .4s ease-out;min-width:280px;}
+        .t-ok{background:linear-gradient(135deg,#16a34a,#22c55e);}.t-err{background:linear-gradient(135deg,#dc2626,#ef4444);}
+        .t-info{background:linear-gradient(135deg,var(--teal-700),var(--teal-500));}.t-warn{background:linear-gradient(135deg,#d97706,#f59e0b);}
+
+        /* === MODAL === */
+        .modal-o{position:fixed;inset:0;background:rgba(15,23,42,.5);backdrop-filter:blur(4px);z-index:50;display:flex;align-items:center;justify-content:center;animation:fadeIn .2s;}
+        .modal-c{background:#fff;border-radius:18px;padding:28px;max-width:540px;width:90%;max-height:90vh;overflow-y:auto;animation:scaleIn .3s ease-out;box-shadow:0 25px 60px rgba(0,0,0,.15);}
+
+        /* === HERO (Sesi 1 - lengkap) === */
+        .hero-bg{background:linear-gradient(135deg,var(--teal-950) 0%,var(--teal-800) 40%,var(--teal-700) 70%,var(--teal-600) 100%);position:relative;overflow:hidden;}
+        .hero-bg::before{content:'';position:absolute;inset:0;background:url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");}
+        .hero-blob{position:absolute;border-radius:50%;filter:blur(80px);opacity:.15;}
+
+        /* === NAV PUBLIK === */
+        .pub-nav{backdrop-filter:blur(12px);background:rgba(255,255,255,.85);border-bottom:1px solid rgba(0,0,0,.05);transition:all .3s;}
+        .pub-nav.scrolled{box-shadow:0 2px 20px rgba(0,0,0,.08);}
+
+        /* === ROOM CARD (Sesi 2) === */
+        .room-img{height:220px;background-size:cover;background-position:center;border-radius:14px 14px 0 0;position:relative;}
+        .room-img .ptag{position:absolute;bottom:12px;right:12px;background:rgba(4,47,46,.85);backdrop-filter:blur(8px);color:var(--teal-200);padding:6px 14px;border-radius:10px;font-weight:700;font-size:15px;}
+
+        /* === METRIC CARD (Sesi 3) === */
+        .metric-card{position:relative;overflow:hidden;border-radius:16px;padding:24px;border:1px solid var(--gray-100);background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.04);transition:all .3s;}
+        .metric-card:hover{box-shadow:0 8px 30px rgba(0,0,0,.08);transform:translateY(-2px);}
+        .metric-card .metric-glow{position:absolute;width:120px;height:120px;border-radius:50%;filter:blur(50px);opacity:.12;top:-30px;right:-30px;}
+
+        /* === BAR CHART (Sesi 3) === */
+        .bar-chart{display:flex;align-items:flex-end;gap:6px;height:140px;padding-top:10px;}
+        .bar-col{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;}
+        .bar-fill{width:100%;border-radius:6px 6px 2px 2px;transition:height .8s cubic-bezier(.4,0,.2,1);transform-origin:bottom;animation:barGrow .8s ease-out forwards;}
+        .bar-label{font-size:10px;color:var(--gray-400);font-weight:500;}
+        .bar-value{font-size:10px;color:var(--gray-600);font-weight:700;}
+
+        /* === STATUS SELECT (Sesi 3) === */
+        .status-select{padding:4px 8px;border-radius:8px;font-size:11px;font-weight:600;border:1.5px solid var(--gray-200);background:#fff;cursor:pointer;font-family:'DM Sans',sans-serif;transition:all .2s;color:var(--gray-700);}
+        .status-select:focus{outline:none;border-color:var(--teal-400);box-shadow:0 0 0 2px rgba(20,184,166,.1);}
+
+        /* === RESPONSIF === */
+        @media(max-width:1024px){.sidebar{transform:translateX(-100%);}.sidebar.mob-open{transform:translateX(0);}.mcontent{margin-left:0!important;}}
+        @media(max-width:768px){.hero-bg{min-height:auto!important;}.dtable thead th,.dtable tbody td{padding:8px 10px;font-size:12px;}}
+        @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important;}}
+    </style>
+</head>
+<body>
+
+<!-- Toast & Modal Container -->
+<div class="toast-c" id="toastC"></div>
+<div id="modalC"></div>
+
+
+<!-- ================================================================ -->
+<!-- ==================== TAMPILAN PUBLIK ========================== -->
+<!-- ================================================================ -->
+<div id="pubView">
+
+    <!-- Navigasi Publik -->
+    <nav class="pub-nav fixed top-0 left-0 right-0 z-30" id="pubNav">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center gap-3 cursor-pointer" onclick="scrollTo('hero')">
+                    <div class="w-9 h-9 rounded-lg flex items-center justify-center" style="background:linear-gradient(135deg,var(--teal-600),var(--teal-400));">
+                        <i class="fas fa-hotel text-white text-sm"></i>
+                    </div>
+                    <span class="font-display font-bold text-lg" style="color:var(--teal-900);">Grand Teal</span>
+                </div>
+                <div class="hidden md:flex items-center gap-8">
+                    <a href="#" onclick="scrollTo('hero')" class="text-sm font-medium text-gray-600 hover:text-teal-700 transition">Beranda</a>
+                    <a href="#" onclick="scrollTo('searchSec')" class="text-sm font-medium text-gray-600 hover:text-teal-700 transition">Cari Kamar</a>
+                    <a href="#" onclick="scrollTo('resSec')" class="text-sm font-medium text-gray-600 hover:text-teal-700 transition" id="navRes" style="display:none;">Hasil Pencarian</a>
+                    <a href="#" onclick="scrollTo('about')" class="text-sm font-medium text-gray-600 hover:text-teal-700 transition">Tentang</a>
+                    <button class="btn-t text-sm" onclick="goAdmin()"><i class="fas fa-lock text-xs"></i> Masuk Admin</button>
+                </div>
+                <button class="md:hidden btn-g" onclick="document.getElementById('mobMenu').classList.toggle('hidden')"><i class="fas fa-bars text-lg"></i></button>
+            </div>
+        </div>
+        <div id="mobMenu" class="md:hidden hidden bg-white border-t border-gray-100 px-4 pb-4">
+            <a href="#" onclick="scrollTo('hero');document.getElementById('mobMenu').classList.add('hidden')" class="block py-3 text-sm font-medium text-gray-600">Beranda</a>
+            <a href="#" onclick="scrollTo('searchSec');document.getElementById('mobMenu').classList.add('hidden')" class="block py-3 text-sm font-medium text-gray-600">Cari Kamar</a>
+            <a href="#" onclick="scrollTo('resSec');document.getElementById('mobMenu').classList.add('hidden')" class="block py-3 text-sm font-medium text-gray-600" id="navResMob" style="display:none;">Hasil Pencarian</a>
+            <a href="#" onclick="scrollTo('about');document.getElementById('mobMenu').classList.add('hidden')" class="block py-3 text-sm font-medium text-gray-600">Tentang</a>
+            <button class="btn-t w-full text-sm mt-2 justify-center" onclick="goAdmin();document.getElementById('mobMenu').classList.add('hidden')"><i class="fas fa-lock text-xs"></i> Masuk Admin</button>
+        </div>
+    </nav>
+
+    <!-- Hero Section (Sesi 1 - lengkap dengan kartu melayang) -->
+    <section id="hero" class="hero-bg flex items-center pt-16 pb-8" style="min-height:700px;">
+        <div class="hero-blob" style="width:400px;height:400px;background:var(--teal-400);top:-100px;right:-50px;"></div>
+        <div class="hero-blob" style="width:300px;height:300px;background:var(--gold);bottom:-80px;left:10%;"></div>
+        <div class="hero-blob" style="width:200px;height:200px;background:var(--teal-300);top:40%;left:50%;"></div>
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 w-full">
+            <div class="grid lg:grid-cols-2 gap-12 items-center">
+                <div>
+                    <div class="anim-up d1">
+                        <span class="inline-flex items-center gap-2 px-4 py-2 rounded-full text-xs font-semibold tracking-wide" style="background:rgba(255,255,255,.1);color:var(--teal-200);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.1);">
+                            <span class="w-2 h-2 rounded-full bg-green-400" style="animation:pulseDot 2s infinite;"></span>
+                            Buka 24 Jam — Reservasi Online
+                        </span>
+                    </div>
+                    <h1 class="font-display text-white mt-6 anim-up d2" style="font-size:clamp(2.5rem,5vw,4rem);font-weight:900;line-height:1.1;">
+                        Pengalaman Menginap<br>
+                        <span style="background:linear-gradient(135deg,var(--teal-300),var(--gold));-webkit-background-clip:text;-webkit-text-fill-color:transparent;">Istimewa</span>
+                    </h1>
+                    <p class="mt-5 text-base leading-relaxed anim-up d3" style="color:var(--teal-200);max-width:460px;">
+                        Nikmati kemewahan dan kenyamanan terbaik di jantung kota. Setiap kamar dirancang dengan detail untuk memastikan momen tak terlupakan selama kunjungan Anda.
+                    </p>
+                    <div class="flex flex-wrap gap-4 mt-8 anim-up d4">
+                        <button class="btn-t text-base px-8 py-3" onclick="scrollTo('searchSec')">
+                            Cari Kamar Tersedia <i class="fas fa-arrow-right text-sm"></i>
+                        </button>
+                        <button class="px-8 py-3 rounded-xl text-base font-semibold transition-all hover:bg-white/10" style="border:2px solid rgba(255,255,255,.25);color:white;background:transparent;" onclick="scrollTo('about')">
+                            Pelajari Lebih Lanjut
+                        </button>
+                    </div>
+                    <!-- Statistik Hero -->
+                    <div class="flex gap-8 mt-10 anim-up d5">
+                        <div><div class="font-display font-bold text-2xl text-white" id="statR">0</div><div class="text-xs mt-1" style="color:var(--teal-300);">Kamar Tersedia</div></div>
+                        <div style="width:1px;background:rgba(255,255,255,.15);"></div>
+                        <div><div class="font-display font-bold text-2xl text-white">4.9</div><div class="text-xs mt-1" style="color:var(--teal-300);">Rating Tamu</div></div>
+                        <div style="width:1px;background:rgba(255,255,255,.15);"></div>
+                        <div><div class="font-display font-bold text-2xl text-white">12+</div><div class="text-xs mt-1" style="color:var(--teal-300);">Tahun Pengalaman</div></div>
+                    </div>
+                </div>
+                <!-- Gambar Hero dengan kartu melayang -->
+                <div class="hidden lg:block anim-up d4">
+                    <div class="relative">
+                        <div class="rounded-2xl overflow-hidden" style="box-shadow:0 30px 60px rgba(0,0,0,.3);">
+                            <img src="https://picsum.photos/seed/grandteal-hero-final/600/450.jpg" alt="Grand Teal Hotel" class="w-full h-auto object-cover" style="aspect-ratio:4/3;">
+                        </div>
+                        <div class="absolute -bottom-6 -left-6 card-el card p-4 anim-float" style="background:white;min-width:180px;">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-full flex items-center justify-center" style="background:var(--teal-50);"><i class="fas fa-star" style="color:var(--gold);"></i></div>
+                                <div><div class="text-sm font-bold" style="color:var(--gray-800);">Top Rated</div><div class="text-xs" style="color:var(--gray-400);">Hotel di Kota</div></div>
+                            </div>
+                        </div>
+                        <div class="absolute -top-4 -right-4 card-el card p-4 anim-float" style="background:white;animation-delay:1s;min-width:160px;">
+                            <div class="flex items-center gap-3">
+                                <div class="w-10 h-10 rounded-full flex items-center justify-center" style="background:#dcfce7;"><i class="fas fa-check-circle text-green-600"></i></div>
+                                <div><div class="text-sm font-bold" style="color:var(--gray-800);">Gratis WiFi</div><div class="text-xs" style="color:var(--gray-400);">Di Semua Kamar</div></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Pencarian Ketersediaan (Sesi 2) -->
+    <section id="searchSec" class="relative z-20 px-4 sm:px-6 lg:px-8" style="margin-top:-48px;">
+        <div class="max-w-5xl mx-auto">
+            <div class="card-el card p-6 sm:p-8 anim-down">
+                <div class="flex items-center gap-3 mb-5">
+                    <div class="w-10 h-10 rounded-xl flex items-center justify-center" style="background:var(--teal-50);"><i class="fas fa-search" style="color:var(--teal-600);"></i></div>
+                    <div><h2 class="font-display text-xl font-bold" style="color:var(--gray-900);">Cari Ketersediaan Kamar</h2><p class="text-xs" style="color:var(--gray-400);">Masukkan tanggal menginap untuk melihat kamar yang tersedia</p></div>
+                </div>
+                <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 items-end">
+                    <div><label class="block text-xs font-semibold mb-1.5" style="color:var(--gray-600);"><i class="fas fa-calendar-alt mr-1" style="color:var(--teal-500);"></i>Tanggal Check-in</label><input type="date" id="sCI" class="ipt" onchange="onDateChg()"></div>
+                    <div><label class="block text-xs font-semibold mb-1.5" style="color:var(--gray-600);"><i class="fas fa-calendar-check mr-1" style="color:var(--teal-500);"></i>Tanggal Check-out</label><input type="date" id="sCO" class="ipt" onchange="onDateChg()"></div>
+                    <div><label class="block text-xs font-semibold mb-1.5" style="color:var(--gray-600);"><i class="fas fa-bed mr-1" style="color:var(--teal-500);"></i>Tipe Kamar</label><select id="sTipe" class="ipt"><option value="all">Semua Tipe</option><option value="Standard">Standard</option><option value="Deluxe">Deluxe</option><option value="Suite">Suite</option><option value="Presidential">Presidential</option></select></div>
+                    <div><button class="btn-t w-full justify-center py-3 text-base" onclick="doSearch()"><i class="fas fa-search"></i> Cari Kamar</button></div>
+                </div>
+                <div id="sSum" class="hidden mt-4 pt-4 border-t border-gray-100">
+                    <div class="flex flex-wrap items-center gap-4 text-sm">
+                        <span style="color:var(--gray-500);"><i class="fas fa-moon mr-1" style="color:var(--teal-500);"></i><strong id="sNights">0</strong> malam</span>
+                        <span style="color:var(--gray-300);">|</span>
+                        <span style="color:var(--gray-500);"><i class="fas fa-calendar mr-1" style="color:var(--teal-500);"></i><span id="sDates">-</span></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Hasil Pencarian (Sesi 2) -->
+    <section id="resSec" class="py-12 px-4 sm:px-6 lg:px-8" style="background:linear-gradient(180deg,#fff,var(--gray-50));display:none;">
+        <div class="max-w-7xl mx-auto">
+            <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8">
+                <div><h2 class="font-display text-2xl sm:text-3xl font-bold" style="color:var(--gray-900);" id="resTitle">Kamar Tersedia</h2><p class="text-sm mt-1" style="color:var(--gray-400);" id="resSub"></p></div>
+                <div class="flex flex-wrap gap-2" id="resFilters"></div>
+            </div>
+            <div id="resGrid" class="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"></div>
+            <div id="resEmpty" class="text-center py-16 hidden">
+                <div class="w-20 h-20 rounded-full mx-auto flex items-center justify-center mb-5" style="background:var(--teal-50);"><i class="fas fa-bed text-3xl" style="color:var(--teal-300);"></i></div>
+                <h3 class="font-display text-xl font-bold mb-2" style="color:var(--gray-800);">Kamar Tidak Tersedia</h3>
+                <p class="text-sm max-w-md mx-auto" style="color:var(--gray-400);">Tidak ada kamar untuk tanggal tersebut. Coba ubah tanggal atau tipe kamar.</p>
+                <button class="btn-o mt-6" onclick="scrollTo('searchSec')"><i class="fas fa-arrow-left"></i> Ubah Pencarian</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Tentang Kami (Sesi 1 - lengkap) -->
+    <section id="about" class="py-20 px-4 sm:px-6 lg:px-8" style="background:#fff;">
+        <div class="max-w-7xl mx-auto">
+            <div class="grid lg:grid-cols-2 gap-16 items-center">
+                <div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <img src="https://picsum.photos/seed/teal-lobby/400/300.jpg" alt="Lobi Hotel" class="rounded-xl object-cover w-full h-48">
+                        <img src="https://picsum.photos/seed/teal-pool/400/300.jpg" alt="Kolam Renang" class="rounded-xl object-cover w-full h-48 mt-8">
+                        <img src="https://picsum.photos/seed/teal-spa/400/300.jpg" alt="Spa" class="rounded-xl object-cover w-full h-48 -mt-4">
+                        <img src="https://picsum.photos/seed/teal-dining/400/300.jpg" alt="Restoran" class="rounded-xl object-cover w-full h-48 mt-4">
+                    </div>
+                </div>
+                <div>
+                    <span class="text-xs font-bold tracking-widest uppercase" style="color:var(--teal-600);">Tentang Kami</span>
+                    <h2 class="font-display text-3xl sm:text-4xl font-bold mt-2" style="color:var(--gray-900);">Mewah, Nyaman, dan Tak Terlupakan</h2>
+                    <p class="text-gray-500 mt-5 leading-relaxed">Grand Teal Hotel berdiri sejak 2012 dengan komitmen memberikan pengalaman menginap terbaik. Berlokasi strategis di pusat kota, kami menyediakan layanan bintang lima dengan sentuhan keramahan khas Indonesia.</p>
+                    <div class="grid grid-cols-2 gap-6 mt-8">
+                        <div class="flex items-start gap-3"><div class="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0" style="background:var(--teal-50);"><i class="fas fa-wifi" style="color:var(--teal-600);"></i></div><div><div class="text-sm font-bold" style="color:var(--gray-800);">WiFi Gratis</div><div class="text-xs text-gray-400 mt-0.5">Kecepatan tinggi</div></div></div>
+                        <div class="flex items-start gap-3"><div class="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0" style="background:var(--teal-50);"><i class="fas fa-utensils" style="color:var(--teal-600);"></i></div><div><div class="text-sm font-bold" style="color:var(--gray-800);">Restoran</div><div class="text-xs text-gray-400 mt-0.5">Masakan internasional</div></div></div>
+                        <div class="flex items-start gap-3"><div class="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0" style="background:var(--teal-50);"><i class="fas fa-swimming-pool" style="color:var(--teal-600);"></i></div><div><div class="text-sm font-bold" style="color:var(--gray-800);">Kolam Renang</div><div class="text-xs text-gray-400 mt-0.5">Rooftop pool</div></div></div>
+                        <div class="flex items-start gap-3"><div class="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0" style="background:var(--teal-50);"><i class="fas fa-spa" style="color:var(--teal-600);"></i></div><div><div class="text-sm font-bold" style="color:var(--gray-800);">Spa & Wellness</div><div class="text-xs text-gray-400 mt-0.5">Perawatan premium</div></div></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer Publik (Sesi 1 - lengkap) -->
+    <footer class="py-10 px-4" style="background:var(--teal-950);">
+        <div class="max-w-7xl mx-auto">
+            <div class="flex flex-col md:flex-row items-center justify-between gap-6">
+                <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 rounded-lg flex items-center justify-center" style="background:linear-gradient(135deg,var(--teal-500),var(--teal-300));"><i class="fas fa-hotel text-white text-xs"></i></div>
+                    <span class="font-display font-bold text-white">Grand Teal Hotel</span>
+                </div>
+                <div class="text-sm" style="color:var(--teal-400);">Jl. Sudirman No. 123, Jakarta Selatan — (021) 555-0123</div>
+                <div class="flex gap-4">
+                    <a href="#" class="w-9 h-9 rounded-full flex items-center justify-center transition hover:bg-teal-800" style="background:rgba(255,255,255,.08);"><i class="fab fa-instagram text-teal-300 text-sm"></i></a>
+                    <a href="#" class="w-9 h-9 rounded-full flex items-center justify-center transition hover:bg-teal-800" style="background:rgba(255,255,255,.08);"><i class="fab fa-facebook text-teal-300 text-sm"></i></a>
+                    <a href="#" class="w-9 h-9 rounded-full flex items-center justify-center transition hover:bg-teal-800" style="background:rgba(255,255,255,.08);"><i class="fab fa-twitter text-teal-300 text-sm"></i></a>
+                </div>
+            </div>
+            <div class="text-center mt-8 text-xs" style="color:var(--teal-600);">&copy; 2025 Grand Teal Hotel. Hak Cipta Dilindungi.</div>
+        </div>
+    </footer>
+</div>
+
+
+<!-- ================================================================ -->
+<!-- ==================== DASBOR ADMIN ============================= -->
+<!-- ================================================================ -->
+<div id="admView" class="hidden">
+
+    <!-- Sidebar (Sesi 1 - compact) -->
+    <aside class="sidebar" id="admSidebar">
+        <div class="p-5 flex items-center gap-3 border-b border-teal-800/50">
+            <div class="w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0" style="background:linear-gradient(135deg,var(--teal-500),var(--teal-300));"><i class="fas fa-hotel text-white text-sm"></i></div>
+            <span class="sbrand font-display font-bold text-white text-lg">Grand Teal</span>
+            <button class="slbl btn-g text-teal-400 ml-auto hidden lg:block" onclick="document.getElementById('admSidebar').classList.toggle('collapsed');document.getElementById('mContent').classList.toggle('exp');" aria-label="Toggle sidebar"><i class="fas fa-bars"></i></button>
+        </div>
+        <div class="py-4">
+            <div class="stitle px-5 mb-2 text-xs font-bold tracking-widest uppercase" style="color:var(--teal-500);opacity:.6;">Menu Utama</div>
+            <div class="sitem active" data-p="dashboard" onclick="navAdm('dashboard')"><i class="fas fa-th-large"></i><span class="slbl">Dasbor</span></div>
+            <div class="sitem" data-p="rooms" onclick="navAdm('rooms')"><i class="fas fa-door-open"></i><span class="slbl">Kelola Kamar</span></div>
+            <div class="sitem" data-p="bookings" onclick="navAdm('bookings')"><i class="fas fa-calendar-check"></i><span class="slbl">Daftar Reservasi</span></div>
+            <div class="sitem" data-p="guests" onclick="navAdm('guests')"><i class="fas fa-users"></i><span class="slbl">Data Tamu</span></div>
+            <div class="stitle px-5 mt-6 mb-2 text-xs font-bold tracking-widest uppercase" style="color:var(--teal-500);opacity:.6;">Lainnya</div>
+            <div class="sitem" onclick="goPub()"><i class="fas fa-globe"></i><span class="slbl">Lihat Website</span></div>
+        </div>
+        <div class="absolute bottom-0 left-0 right-0 p-4 border-t border-teal-800/50">
+            <div class="flex items-center gap-3">
+                <div class="w-9 h-9 rounded-full flex items-center justify-center flex-shrink-0" style="background:linear-gradient(135deg,var(--gold),var(--gold-light));"><i class="fas fa-user text-sm" style="color:var(--teal-900);"></i></div>
+                <div class="slbl"><div class="text-sm font-semibold text-white">Administrator</div><div class="text-xs" style="color:var(--teal-400);">admin@grandteal.id</div></div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Konten Utama Admin -->
+    <div class="mcontent" id="mContent">
+        <header class="sticky top-0 z-20 bg-white/80 backdrop-blur-lg border-b border-gray-100">
+            <div class="flex items-center justify-between px-6 py-4">
+                <div class="flex items-center gap-4">
+                    <button class="lg:hidden btn-g" onclick="document.getElementById('admSidebar').classList.toggle('mob-open')" aria-label="Menu"><i class="fas fa-bars text-lg"></i></button>
+                    <div><h1 class="text-lg font-bold" style="color:var(--gray-800);" id="aTitle">Dasbor</h1><p class="text-xs" style="color:var(--gray-400);" id="aSub">Ringkasan operasional hotel</p></div>
+                </div>
+                <div class="flex items-center gap-3">
+                    <span class="hidden sm:flex items-center gap-2 text-xs px-3 py-1.5 rounded-lg" style="background:var(--teal-50);color:var(--teal-700);font-weight:600;"><i class="fas fa-clock"></i><span id="liveClock"></span></span>
+                </div>
+            </div>
+        </header>
+        <div class="p-6" id="aPage"></div>
+    </div>
+</div>
+
+
+<script>
+// ==============================================================
+// ==================== DATABASE SIMULASI ========================
+// ==============================================================
+
+const NOW=new Date(),CY=NOW.getFullYear(),CM=NOW.getMonth();
+function ds(y,m,d){return `${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;}
+function addD(s,n){const d=new Date(s);d.setDate(d.getDate()+n);return d.toISOString().split('T')[0];}
+
+const defRooms=[
+    {id:'R001',nomor:'101',tipe:'Standard',harga:450000,status:'Available',gambar:'teal-std-101'},
+    {id:'R002',nomor:'102',tipe:'Standard',harga:450000,status:'Available',gambar:'teal-std-102'},
+    {id:'R003',nomor:'103',tipe:'Standard',harga:450000,status:'Available',gambar:'teal-std-103'},
+    {id:'R004',nomor:'201',tipe:'Deluxe',harga:750000,status:'Available',gambar:'teal-dlx-201'},
+    {id:'R005',nomor:'202',tipe:'Deluxe',harga:750000,status:'Available',gambar:'teal-dlx-202'},
+    {id:'R006',nomor:'203',tipe:'Deluxe',harga:750000,status:'Available',gambar:'teal-dlx-203'},
+    {id:'R007',nomor:'301',tipe:'Suite',harga:1200000,status:'Available',gambar:'teal-ste-301'},
+    {id:'R008',nomor:'302',tipe:'Suite',harga:1200000,status:'Available',gambar:'teal-ste-302'},
+    {id:'R009',nomor:'401',tipe:'Presidential',harga:2500000,status:'Available',gambar:'teal-prs-401'},
+    {id:'R010',nomor:'402',tipe:'Presidential',harga:2500000,status:'Available',gambar:'teal-prs-402'},
+];
+const defGuests=[
+    {id:'G001',nama:'Budi Santoso',email:'budi@email.com',telepon:'081234567890'},
+    {id:'G002',nama:'Siti Rahayu',email:'siti@email.com',telepon:'082345678901'},
+    {id:'G003',nama:'Ahmad Wijaya',email:'ahmad@email.com',telepon:'083456789012'},
+    {id:'G004',nama:'Dewi Lestari',email:'dewi@email.com',telepon:'084567890123'},
+    {id:'G005',nama:'Rudi Hermawan',email:'rudi@email.com',telepon:'085678901234'},
+    {id:'G006',nama:'Maya Putri',email:'maya@email.com',telepon:'086789012345'},
+    {id:'G007',nama:'Joko Prasetyo',email:'joko@email.com',telepon:'087890123456'},
+];
+// Booking historis bulan ini untuk simulasi pendapatan (Sesi 3)
+const dayNow=Math.min(NOW.getDate(),28);
+const defBookings=[
+    {id:'BK001',roomId:'R003',guestId:'G001',checkIn:ds(CY,CM,1),checkOut:ds(CY,CM,4),totalBiaya:1350000,status:'Checked-In'},
+    {id:'BK002',roomId:'R006',guestId:'G002',checkIn:ds(CY,CM,3),checkOut:ds(CY,CM,6),totalBiaya:2250000,status:'Checked-In'},
+    {id:'BK003',roomId:'R010',guestId:'G003',checkIn:ds(CY,CM,5),checkOut:ds(CY,CM,8),totalBiaya:7500000,status:'Checked-In'},
+    {id:'BK004',roomId:'R002',guestId:'G004',checkIn:ds(CY,CM,7),checkOut:ds(CY,CM,9),totalBiaya:900000,status:'Canceled'},
+    {id:'BK005',roomId:'R001',guestId:'G005',checkIn:ds(CY,CM,dayNow),checkOut:addD(ds(CY,CM,dayNow),3),totalBiaya:1350000,status:'Confirmed'},
+    {id:'BK006',roomId:'R004',guestId:'G006',checkIn:addD(ds(CY,CM,dayNow),1),checkOut:addD(ds(CY,CM,dayNow),4),totalBiaya:2250000,status:'Confirmed'},
+    {id:'BK007',roomId:'R007',guestId:'G007',checkIn:addD(ds(CY,CM,dayNow),-1),checkOut:addD(ds(CY,CM,dayNow),2),totalBiaya:3600000,status:'Checked-In'},
+];
+
+// --- Operasi Database ---
+function initDB(){if(!localStorage.getItem('hms_r'))localStorage.setItem('hms_r',JSON.stringify(defRooms));if(!localStorage.getItem('hms_g'))localStorage.setItem('hms_g',JSON.stringify(defGuests));if(!localStorage.getItem('hms_b'))localStorage.setItem('hms_b',JSON.stringify(defBookings));}
+function gR(){return JSON.parse(localStorage.getItem('hms_r')||'[]');}
+function gG(){return JSON.parse(localStorage.getItem('hms_g')||'[]');}
+function gB(){return JSON.parse(localStorage.getItem('hms_b')||'[]');}
+function sR(d){localStorage.setItem('hms_r',JSON.stringify(d));}
+function sG(d){localStorage.setItem('hms_g',JSON.stringify(d));}
+function sB(d){localStorage.setItem('hms_b',JSON.stringify(d));}
+function rById(id){return gR().find(r=>r.id===id);}
+function gById(id){return gG().find(g=>g.id===id);}
+function bById(id){return gB().find(b=>b.id===id);}
+function gid(p){return p+(Math.floor(Math.random()*9000)+1000);}
+function fRp(n){return 'Rp '+Number(n).toLocaleString('id-ID');}
+function fDt(s){return new Date(s).toLocaleDateString('id-ID',{day:'numeric',month:'short',year:'numeric'});}
+function nM(ci,co){return Math.max(1,Math.ceil((new Date(co)-new Date(ci))/864e5));}
+
+// Cek ketersediaan berdasarkan overlap tanggal (Sesi 2)
+function isAvail(rid,ci,co){const ns=new Date(ci),ne=new Date(co);return !gB().filter(b=>b.roomId===rid&&b.status==='Confirmed').some(b=>{const bs=new Date(b.checkIn),be=new Date(b.checkOut);return ns<be&&ne>bs;});}
+
+// Status kamar real-time berdasarkan booking (Sesi 3)
+function roomLiveStatus(rid){
+    const today=new Date();today.setHours(0,0,0,0);
+    const bks=gB().filter(b=>b.roomId===rid&&b.status!=='Canceled');
+    for(const b of bks){
+        const ci=new Date(b.checkIn);ci.setHours(0,0,0,0);
+        const co=new Date(b.checkOut);co.setHours(0,0,0,0);
+        if(today>=ci&&today<co)return 'Occupied';
+        if(today<ci&&b.status==='Confirmed')return 'Reserved';
+    }
+    return 'Available';
+}
+
+function resetDB(){localStorage.setItem('hms_r',JSON.stringify(defRooms));localStorage.setItem('hms_g',JSON.stringify(defGuests));localStorage.setItem('hms_b',JSON.stringify(defBookings));toast('Database berhasil direset ke data awal','info');navAdm(curPage);}
+
+
+// ==============================================================
+// ==================== UTILITAS UI ==============================
+// ==============================================================
+
+function toast(msg,type='info'){
+    const c=document.getElementById('toastC');
+    const ic={success:'fa-check-circle',error:'fa-times-circle',info:'fa-info-circle',warning:'fa-exclamation-triangle'};
+    const t=document.createElement('div');
+    t.className=`toast t-${type==='success'?'ok':type==='error'?'err':type==='warning'?'warn':'info'}`;
+    t.innerHTML=`<i class="fas ${ic[type]||ic.info}"></i><span>${msg}</span>`;
+    c.appendChild(t);
+    setTimeout(()=>{t.style.transition='all .3s';t.style.opacity='0';t.style.transform='translateX(30px)';setTimeout(()=>t.remove(),300);},3500);
+}
+
+function showModal(title,content,footer=''){
+    document.getElementById('modalC').innerHTML=`
+        <div class="modal-o" onclick="if(event.target===this)closeM();">
+            <div class="modal-c" role="dialog" aria-modal="true" aria-label="${title}">
+                <div class="flex items-center justify-between mb-5">
+                    <h3 class="font-display text-xl font-bold" style="color:var(--gray-900);">${title}</h3>
+                    <button class="btn-g" onclick="closeM()" aria-label="Tutup"><i class="fas fa-times text-gray-400"></i></button>
+                </div>
+                <div>${content}</div>
+                ${footer?`<div class="flex justify-end gap-3 mt-6 pt-5 border-t border-gray-100">${footer}</div>`:''}
+            </div>
+        </div>`;
+}
+function closeM(){document.getElementById('modalC').innerHTML='';}
+
+
+// ==============================================================
+// ==================== NAVIGASI ================================
+// ==============================================================
+
+let curPage='dashboard';let searchRes=[];
+
+function goPub(){document.getElementById('admView').classList.add('hidden');document.getElementById('pubView').classList.remove('hidden');animStat();window.scrollTo(0,0);}
+function goAdmin(){document.getElementById('pubView').classList.add('hidden');document.getElementById('admView').classList.remove('hidden');navAdm('dashboard');}
+function scrollTo(id){const el=document.getElementById(id);if(el)el.scrollIntoView({behavior:'smooth'});}
+
+function navAdm(p){
+    curPage=p;
+    document.querySelectorAll('.sitem[data-p]').forEach(i=>i.classList.toggle('active',i.dataset.p===p));
+    document.getElementById('admSidebar').classList.remove('mob-open');
+    const t={dashboard:['Dasbor','Ringkasan operasional hotel hari ini'],rooms:['Kelola Kamar','Tambah, edit, dan hapus kamar hotel'],bookings:['Daftar Reservasi','Kelola status dan detail reservasi'],guests:['Data Tamu','Daftar tamu terdaftar']};
+    document.getElementById('aTitle').textContent=t[p]?.[0]||'';
+    document.getElementById('aSub').textContent=t[p]?.[1]||'';
+    const fn={dashboard:pgDash,rooms:pgRooms,bookings:pgBookings,guests:pgGuests};
+    if(fn[p])fn[p]();
+}
+
+// Jam hidup di header admin
+setInterval(()=>{const el=document.getElementById('liveClock');if(el)el.textContent=new Date().toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit',second:'2-digit'});},1000);
+// Scroll effect navbar publik
+window.addEventListener('scroll',()=>{const n=document.getElementById('pubNav');if(n)n.classList.toggle('scrolled',window.scrollY>20);});
+
+
+// ==============================================================
+// ==================== PENCARIAN PUBLIK (Sesi 2) ================
+// ==============================================================
+
+function initDates(){
+    const t=new Date();t.setDate(t.getDate()+1);const ta=new Date();ta.setDate(ta.getDate()+2);
+    const ci=document.getElementById('sCI'),co=document.getElementById('sCO');
+    if(ci){ci.min=t.toISOString().split('T')[0];ci.value=t.toISOString().split('T')[0];}
+    if(co){co.min=ta.toISOString().split('T')[0];co.value=ta.toISOString().split('T')[0];}
+    onDateChg();
+}
+
+function onDateChg(){
+    const ci=document.getElementById('sCI').value,co=document.getElementById('sCO').value,sm=document.getElementById('sSum');
+    if(ci&&co&&new Date(co)>new Date(ci)){
+        document.getElementById('sNights').textContent=nM(ci,co);
+        document.getElementById('sDates').textContent=`${fDt(ci)} — ${fDt(co)}`;
+        sm.classList.remove('hidden');
+        const nd=new Date(ci);nd.setDate(nd.getDate()+1);
+        document.getElementById('sCO').min=nd.toISOString().split('T')[0];
+        if(new Date(co)<=new Date(ci))document.getElementById('sCO').value=nd.toISOString().split('T')[0];
+    }else sm.classList.add('hidden');
+}
+
+function doSearch(){
+    const ci=document.getElementById('sCI').value,co=document.getElementById('sCO').value,tf=document.getElementById('sTipe').value;
+    if(!ci){toast('Pilih tanggal check-in','error');return;}
+    if(!co){toast('Pilih tanggal check-out','error');return;}
+    if(new Date(co)<=new Date(ci)){toast('Check-out harus setelah check-in','error');return;}
+    const m=nM(ci,co);let rooms=gR();
+    if(tf!=='all')rooms=rooms.filter(r=>r.tipe===tf);
+    rooms=rooms.filter(r=>isAvail(r.id,ci,co));
+    searchRes=rooms;
+    renderRes(rooms,ci,co,m,tf);
+}
+
+function renderRes(rooms,ci,co,m,tf){
+    const sec=document.getElementById('resSec');sec.style.display='';
+    document.getElementById('navRes').style.display='';
+    document.getElementById('navResMob').style.display='';
+    document.getElementById('resTitle').textContent=`${rooms.length} Kamar Tersedia`;
+    document.getElementById('resSub').textContent=`${fDt(ci)} — ${fDt(co)} (${m} malam)${tf!=='all'?' — '+tf:''}`;
+    const types=['all',...new Set(rooms.map(r=>r.tipe))];
+    document.getElementById('resFilters').innerHTML=types.map(t=>`
+        <button class="rfb px-3 py-1.5 rounded-full text-xs font-semibold transition-all" data-f="${t}" onclick="filterRes('${t}','${ci}','${co}',${m})"
+            style="${t==='all'?'background:linear-gradient(135deg,var(--teal-600),var(--teal-500));color:#fff;box-shadow:0 2px 8px rgba(13,148,136,.25);':'background:#fff;color:var(--gray-600);border:1px solid var(--gray-200);'}">
+            ${t==='all'?'Semua':t}
+        </button>`).join('');
+    if(!rooms.length){document.getElementById('resGrid').innerHTML='';document.getElementById('resGrid').classList.add('hidden');document.getElementById('resEmpty').classList.remove('hidden');}
+    else{document.getElementById('resEmpty').classList.add('hidden');document.getElementById('resGrid').classList.remove('hidden');renderResCards(rooms,ci,co,m);}
+    setTimeout(()=>scrollTo('resSec'),100);
+}
+
+function filterRes(t,ci,co,m){
+    let f=searchRes;if(t!=='all')f=f.filter(r=>r.tipe===t);
+    document.querySelectorAll('.rfb').forEach(b=>{const a=b.dataset.f===t;b.style.background=a?'linear-gradient(135deg,var(--teal-600),var(--teal-500))':'#fff';b.style.color=a?'#fff':'var(--gray-600)';b.style.boxShadow=a?'0 2px 8px rgba(13,148,136,.25)':'none';b.style.border=a?'none':'1px solid var(--gray-200)';});
+    document.getElementById('resTitle').textContent=`${f.length} Kamar Tersedia`;
+    if(!f.length){document.getElementById('resGrid').innerHTML='';document.getElementById('resGrid').classList.add('hidden');document.getElementById('resEmpty').classList.remove('hidden');}
+    else{document.getElementById('resEmpty').classList.add('hidden');document.getElementById('resGrid').classList.remove('hidden');renderResCards(f,ci,co,m);}
+}
+
+function renderResCards(rooms,ci,co,m){
+    const ic={Standard:'fa-bed',Deluxe:'fa-star',Suite:'fa-crown',Presidential:'fa-gem'};
+    const cc={Standard:'#64748b',Deluxe:'#0d9488',Suite:'#7c3aed',Presidential:'#d4a853'};
+    const sz={Standard:'25',Deluxe:'35',Suite:'55',Presidential:'80'};
+    const am={Standard:['WiFi','AC','TV LED'],Deluxe:['WiFi','AC','TV LED','Minibar','Balkon'],Suite:['WiFi','AC','TV LED','Minibar','Balkon','Bathtub','R. Tamu'],Presidential:['WiFi','AC','TV LED','Minibar','Balkon','Bathtub','R. Tamu','Jacuzzi','Butler']};
+    document.getElementById('resGrid').innerHTML=rooms.map((r,i)=>{
+        const tot=r.harga*m;
+        return `<div class="card card-el overflow-hidden anim-up d-${Math.min(i+1,6)}" style="opacity:0;transition:transform .3s;" onmouseover="this.style.transform='translateY(-4px)'" onmouseout="this.style.transform=''">
+            <div class="room-img" style="background-image:url('https://picsum.photos/seed/${r.gambar}/500/300.jpg');">
+                <div class="ptag">${fRp(r.harga)}<span class="text-xs font-normal opacity-70">/malam</span></div>
+                <div class="absolute top-3 left-3"><span class="badge b-avail"><i class="fas fa-check-circle mr-1 text-xs"></i>Tersedia</span></div>
+            </div>
+            <div class="p-5">
+                <div class="flex items-center justify-between mb-2">
+                    <span class="text-xs font-bold tracking-wide uppercase" style="color:${cc[r.tipe]};"><i class="fas ${ic[r.tipe]} mr-1"></i>${r.tipe}</span>
+                    <span class="text-xs text-gray-400">No. ${r.nomor}</span>
+                </div>
+                <h3 class="font-bold text-base" style="color:var(--gray-800);">Kamar ${r.nomor}</h3>
+                <div class="flex items-center gap-3 mt-2 text-xs text-gray-400">
+                    <span><i class="fas fa-user-friends mr-1"></i>2 Tamu</span>
+                    <span><i class="fas fa-ruler-combined mr-1"></i>${sz[r.tipe]} m²</span>
+                </div>
+                <div class="flex flex-wrap gap-1.5 mt-3">
+                    ${am[r.tipe].slice(0,3).map(a=>`<span class="text-xs px-2 py-0.5 rounded-md" style="background:var(--gray-50);color:var(--gray-500);">${a}</span>`).join('')}
+                    ${am[r.tipe].length>3?`<span class="text-xs px-2 py-0.5 rounded-md" style="background:var(--teal-50);color:var(--teal-600);">+${am[r.tipe].length-3}</span>`:''}
+                </div>
+                <div class="mt-4 pt-3 border-t border-gray-100 space-y-1.5">
+                    <div class="flex justify-between text-xs"><span style="color:var(--gray-400);">${fRp(r.harga)} x ${m} malam</span><span style="color:var(--gray-600);">${fRp(tot)}</span></div>
+                    <div class="flex justify-between font-bold text-sm"><span style="color:var(--gray-800);">Total</span><span style="color:var(--teal-700);">${fRp(tot)}</span></div>
+                </div>
+                <button class="btn-t w-full mt-4 py-2.5 text-sm justify-center" onclick="openBkForm('${r.id}','${ci}','${co}')"><i class="fas fa-calendar-plus"></i> Pesan Sekarang</button>
+            </div>
+        </div>`;
+    }).join('');
+}
+
+
+// ==============================================================
+// ==================== FORM BOOKING PUBLIK (Sesi 2) ============
+// ==============================================================
+
+function openBkForm(rid,ci,co){
+    const r=rById(rid);if(!r)return;
+    if(!isAvail(rid,ci,co)){toast('Kamar baru saja dipesan. Cari ulang.','error');doSearch();return;}
+    const m=nM(ci,co),tot=r.harga*m;
+    showModal(`Pesan Kamar ${r.nomor}`,`
+        <div class="space-y-4">
+            <div class="p-4 rounded-xl flex items-center gap-4" style="background:var(--teal-50);border:1px solid var(--teal-100);">
+                <div class="w-16 h-16 rounded-lg overflow-hidden flex-shrink-0"><img src="https://picsum.photos/seed/${r.gambar}/150/150.jpg" alt="" class="w-full h-full object-cover"></div>
+                <div class="flex-1"><div class="font-bold text-sm" style="color:var(--gray-800);">Kamar ${r.nomor} — ${r.tipe}</div><div class="text-sm font-semibold mt-0.5" style="color:var(--teal-700);">${fRp(r.harga)}/malam</div><div class="text-xs mt-1" style="color:var(--gray-400);">${fDt(ci)} — ${fDt(co)} (${m} malam)</div></div>
+            </div>
+            <div><label class="block text-xs font-semibold mb-1.5" style="color:var(--gray-600);">Nama Lengkap</label><input type="text" id="bkN" class="ipt" placeholder="Nama Anda"></div>
+            <div class="grid grid-cols-2 gap-3">
+                <div><label class="block text-xs font-semibold mb-1.5" style="color:var(--gray-600);">Email</label><input type="email" id="bkE" class="ipt" placeholder="email@contoh.com"></div>
+                <div><label class="block text-xs font-semibold mb-1.5" style="color:var(--gray-600);">No. Telepon</label><input type="tel" id="bkT" class="ipt" placeholder="08xx-xxxx-xxxx"></div>
+            </div>
+            <div><label class="block text-xs font-semibold mb-1.5" style="color:var(--gray-600);">Catatan Khusus <span class="font-normal text-gray-400">(opsional)</span></label><textarea id="bkC" class="ipt" rows="2" placeholder="Permintaan khusus..."></textarea></div>
+            <div class="p-4 rounded-xl" style="background:var(--gray-50);border:1px solid var(--gray-200);">
+                <div class="flex justify-between text-sm"><span style="color:var(--gray-500);">${fRp(r.harga)} x ${m} malam</span><span class="font-semibold" style="color:var(--gray-700);">${fRp(tot)}</span></div>
+                <div class="border-t border-gray-200 mt-3 pt-3 flex justify-between"><span class="font-bold" style="color:var(--gray-800);">Total Biaya</span><span class="font-bold text-lg" style="color:var(--teal-700);">${fRp(tot)}</span></div>
+            </div>
+        </div>`,
+    `<button class="btn-o" onclick="closeM()">Batal</button><button class="btn-t" onclick="submitBk('${rid}','${ci}','${co}')"><i class="fas fa-check"></i> Konfirmasi Pesanan</button>`);
+}
+
+function submitBk(rid,ci,co){
+    const n=document.getElementById('bkN').value.trim(),e=document.getElementById('bkE').value.trim(),t=document.getElementById('bkT').value.trim();
+    if(!n){toast('Nama wajib diisi','error');return;}if(!e||!e.includes('@')){toast('Email tidak valid','error');return;}if(!t||t.length<10){toast('Telepon tidak valid (min 10 digit)','error');return;}
+    if(!isAvail(rid,ci,co)){closeM();toast('Kamar baru dipesan orang lain','error');doSearch();return;}
+    const r=rById(rid),m=nM(ci,co),tot=r.harga*m;
+    let gs=gG();let g=gs.find(x=>x.email===e);
+    if(!g){g={id:gid('G'),nama:n,email:e,telepon:t};gs.push(g);}else{g.nama=n;g.telepon=t;}
+    sG(gs);
+    const bks=gB();const bk={id:gid('BK'),roomId:rid,guestId:g.id,checkIn:ci,checkOut:co,totalBiaya:tot,status:'Confirmed'};bks.push(bk);sB(bks);
+    closeM();
+    showModal('Reservasi Berhasil',`
+        <div class="text-center py-4">
+            <div class="w-20 h-20 rounded-full mx-auto flex items-center justify-center mb-5" style="background:#dcfce7;"><i class="fas fa-check-circle text-4xl" style="color:var(--success);"></i></div>
+            <h3 class="font-display text-2xl font-bold mb-2" style="color:var(--gray-900);">Terima Kasih, ${n.split(' ')[0]}!</h3>
+            <p class="text-sm mb-5" style="color:var(--gray-500);">Berikut detail pemesanan Anda:</p>
+            <div class="text-left p-5 rounded-xl space-y-3" style="background:var(--gray-50);border:1px solid var(--gray-200);">
+                <div class="flex justify-between text-sm"><span style="color:var(--gray-400);">ID Reservasi</span><span class="font-mono font-bold" style="color:var(--teal-700);">${bk.id}</span></div>
+                <div class="flex justify-between text-sm"><span style="color:var(--gray-400);">Kamar</span><span class="font-semibold" style="color:var(--gray-800);">No. ${r.nomor} — ${r.tipe}</span></div>
+                <div class="flex justify-between text-sm"><span style="color:var(--gray-400);">Tanggal</span><span class="font-semibold" style="color:var(--gray-800);">${fDt(ci)} — ${fDt(co)}</span></div>
+                <div class="flex justify-between text-sm"><span style="color:var(--gray-400);">Durasi</span><span class="font-semibold" style="color:var(--gray-800);">${m} malam</span></div>
+                <div class="border-t border-gray-200 pt-3 flex justify-between"><span class="font-bold" style="color:var(--gray-800);">Total</span><span class="font-bold text-lg" style="color:var(--teal-700);">${fRp(tot)}</span></div>
+            </div>
+            <p class="text-xs mt-4" style="color:var(--gray-400);">Detail dikirim ke ${e}. Harap datang sesuai tanggal check-in.</p>
+        </div>`,
+    `<button class="btn-t" onclick="closeM();doSearch();"><i class="fas fa-check"></i> Selesai</button>`);
+    toast(`Reservasi berhasil! ID: ${bk.id}`,'success');
+}
+
+function animStat(){const el=document.getElementById('statR');if(!el)return;const avail=gR().filter(r=>roomLiveStatus(r.id)==='Available').length;let c=0;const s=Math.max(1,Math.ceil(avail/20));const tm=setInterval(()=>{c+=s;if(c>=avail){c=avail;clearInterval(tm);}el.textContent=c;},50);}
+
+
+// ==============================================================
+// ==================== DASBOR RINGKASAN (Sesi 3) ================
+// ==============================================================
+
+function pgDash(){
+    const rooms=gR(),bks=gB(),gs=gG();
+    const today=new Date();today.setHours(0,0,0,0);
+
+    // METRIK 1: Kamar Terisi Hari Ini
+    let occupiedToday=0;rooms.forEach(r=>{if(roomLiveStatus(r.id)==='Occupied')occupiedToday++;});
+
+    // METRIK 2: Kamar Tersedia Hari Ini
+    let availToday=0;rooms.forEach(r=>{if(roomLiveStatus(r.id)==='Available')availToday++;});
+
+    // METRIK 3: Pendapatan Bulan Ini
+    const monthBks=bks.filter(b=>{const co=new Date(b.checkOut);return co.getMonth()===CM&&co.getFullYear()===CY&&b.status==='Checked-In';});
+    const monthRev=monthBks.reduce((s,b)=>s+b.totalBiaya,0);
+
+    const totalR=rooms.length,occRate=totalR>0?Math.round((occupiedToday/totalR)*100):0;
+    const activeBk=bks.filter(b=>b.status==='Confirmed').length;
+    const checkedInNow=bks.filter(b=>b.status==='Checked-In'&&new Date(b.checkIn)<=today&&new Date(b.checkOut)>today).length;
+
+    // Data chart harian
+    const dailyRev=new Array(Math.min(NOW.getDate(),28)).fill(0);
+    monthBks.forEach(b=>{
+        const perDay=b.totalBiaya/nM(b.checkIn,b.checkOut);
+        for(let d=new Date(b.checkIn);d<new Date(b.checkOut);d.setDate(d.getDate()+1)){
+            if(d.getMonth()===CM&&d.getFullYear()===CY){const idx=d.getDate()-1;if(idx>=0&&idx<dailyRev.length)dailyRev[idx]+=perDay;}
+        }
+    });
+    const maxRev=Math.max(...dailyRev,1);
+
+    document.getElementById('aPage').innerHTML=`
+        <!-- 3 Metrik Utama -->
+        <div class="grid sm:grid-cols-3 gap-6 mb-8">
+            <div class="metric-card anim-up d1" style="opacity:0;">
+                <div class="metric-glow" style="background:var(--teal-500);"></div>
+                <div class="flex items-center gap-4 mb-4">
+                    <div class="w-14 h-14 rounded-2xl flex items-center justify-center" style="background:linear-gradient(135deg,var(--teal-100),var(--teal-50));"><i class="fas fa-door-closed text-xl" style="color:var(--teal-600);"></i></div>
+                    <div><p class="text-xs font-semibold uppercase tracking-wider" style="color:var(--gray-400);">Kamar Terisi Hari Ini</p><p class="text-3xl font-bold mt-0.5" style="color:var(--gray-900);">${occupiedToday}</p></div>
+                </div>
+                <div class="flex items-center gap-2 text-xs" style="color:var(--gray-400);"><span>${checkedInNow} tamu sedang check-in</span><span style="color:var(--gray-200);">|</span><span>Hunian <strong style="color:var(--teal-600);">${occRate}%</strong></span></div>
+                <div class="w-full h-2 rounded-full mt-3 overflow-hidden" style="background:var(--gray-100);"><div class="h-full rounded-full" style="width:${occRate}%;background:linear-gradient(90deg,var(--teal-400),var(--teal-600));transition:width 1s;"></div></div>
+            </div>
+            <div class="metric-card anim-up d2" style="opacity:0;">
+                <div class="metric-glow" style="background:var(--success);"></div>
+                <div class="flex items-center gap-4 mb-4">
+                    <div class="w-14 h-14 rounded-2xl flex items-center justify-center" style="background:linear-gradient(135deg,#dcfce7,#f0fdf4);"><i class="fas fa-door-open text-xl" style="color:var(--success);"></i></div>
+                    <div><p class="text-xs font-semibold uppercase tracking-wider" style="color:var(--gray-400);">Kamar Tersedia Hari Ini</p><p class="text-3xl font-bold mt-0.5" style="color:var(--gray-900);">${availToday}</p></div>
+                </div>
+                <div class="flex items-center gap-2 text-xs" style="color:var(--gray-400);"><span>dari ${totalR} total kamar</span><span style="color:var(--gray-200);">|</span><span>${activeBk} reservasi mendatang</span></div>
+                <div class="flex gap-1 mt-3">${rooms.slice(0,10).map(r=>{const st=roomLiveStatus(r.id);const c=st==='Available'?'var(--success)':st==='Occupied'?'var(--teal-500)':'var(--warning)';return `<div class="flex-1 h-2 rounded-full" style="background:${c};opacity:${st==='Available'?.4:.8};" title="Kamar ${r.nomor}: ${st}"></div>`;}).join('')}</div>
+            </div>
+            <div class="metric-card anim-up d3" style="opacity:0;">
+                <div class="metric-glow" style="background:var(--gold);"></div>
+                <div class="flex items-center gap-4 mb-4">
+                    <div class="w-14 h-14 rounded-2xl flex items-center justify-center" style="background:linear-gradient(135deg,var(--gold-light),#fef9ee);"><i class="fas fa-coins text-xl" style="color:var(--gold);"></i></div>
+                    <div><p class="text-xs font-semibold uppercase tracking-wider" style="color:var(--gray-400);">Pendapatan Bulan Ini</p><p class="text-2xl font-bold mt-0.5" style="color:var(--gray-900);">${fRp(monthRev)}</p></div>
+                </div>
+                <div class="flex items-center gap-2 text-xs" style="color:var(--gray-400);"><span>${monthBks.length} transaksi selesai</span><span style="color:var(--gray-200);">|</span><span>Rata-rata ${monthBks.length>0?fRp(Math.round(monthRev/monthBks.length)):'/trx':'-'}</span></div>
+                <div class="flex items-end gap-0.5 mt-3 h-6">${dailyRev.slice(-14).map((v,i)=>`<div class="flex-1 rounded-sm" style="height:${Math.max(4,(v/maxRev)*100)}%;background:${i===dailyRev.slice(-14).length-1?'var(--gold)':'var(--gold-light)'};opacity:${.3+(v/maxRev)*.7};"></div>`).join('')}</div>
+            </div>
+        </div>
+
+        <!-- Chart Pendapatan Harian -->
+        <div class="card p-6 mb-8 anim-up d4" style="opacity:0;">
+            <div class="flex items-center justify-between mb-5">
+                <div><h3 class="font-bold text-base" style="color:var(--gray-800);">Pendapatan Harian Bulan Ini</h3><p class="text-xs mt-0.5" style="color:var(--gray-400);">Visualisasi per hari (Rp)</p></div>
+                <div class="text-right"><div class="text-lg font-bold" style="color:var(--teal-700);">${fRp(monthRev)}</div><div class="text-xs" style="color:var(--gray-400);">total bulan ini</div></div>
+            </div>
+            <div class="bar-chart">${dailyRev.map((v,i)=>{const h=Math.max(2,(v/maxRev)*100);const isToday=i===NOW.getDate()-1;return `<div class="bar-col"><div class="bar-value">${v>0?fRp(Math.round(v/1000))+'rb':'-'}</div><div class="bar-fill" style="height:${h}%;background:${isToday?'linear-gradient(180deg,var(--teal-400),var(--teal-600))':'linear-gradient(180deg,var(--teal-100),var(--teal-200))'};${isToday?'box-shadow:0 0 12px rgba(13,148,136,.3);':''}"></div><div class="bar-label" style="${isToday?'color:var(--teal-600);font-weight:700;':''}">${i+1}</div></div>`;}).join('')}</div>
+        </div>
+
+        <div class="grid lg:grid-cols-2 gap-6">
+            <div class="card p-6 anim-up d5" style="opacity:0;">
+                <div class="flex items-center justify-between mb-4"><h3 class="font-bold text-base" style="color:var(--gray-800);">Reservasi Terbaru</h3><button class="text-xs font-semibold" style="color:var(--teal-600);" onclick="navAdm('bookings')">Lihat Semua <i class="fas fa-arrow-right ml-1"></i></button></div>
+                ${bks.slice(-6).reverse().map(b=>{const r=rById(b.roomId),g=gById(b.guestId);const sc={'Confirmed':'b-conf',Canceled:'b-cancel','Checked-In':'b-checkin','Checked-Out':'b-checkout'};const si={'Confirmed':'fa-clock',Canceled:'fa-times-circle','Checked-In':'fa-sign-in-alt','Checked-Out':'fa-sign-out-alt'};return `<div class="flex items-center gap-3 py-3 border-b border-gray-50 last:border-0"><div class="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0" style="background:${b.status==='Confirmed'?'var(--teal-50)':b.status==='Checked-In'?'#e0e7ff':'#fef3c7'};"><i class="fas ${si[b.status]||'fa-circle'} text-sm" style="color:${b.status==='Confirmed'?'var(--teal-600)':b.status==='Checked-In'?'#4f46e5':'var(--warning)'};"></i></div><div class="flex-1 min-w-0"><div class="text-sm font-semibold truncate" style="color:var(--gray-800);">${g?g.nama:'-'}</div><div class="text-xs" style="color:var(--gray-400);">Kamar ${r?r.nomor:'?'} — ${fDt(b.checkIn)}</div></div><div class="text-right flex-shrink-0"><div class="text-sm font-bold" style="color:var(--gray-800);">${fRp(b.totalBiaya)}</div><span class="badge ${sc[b.status]||'b-conf'} text-xs">${b.status}</span></div></div>`;}).join('')}
+            </div>
+            <div class="card p-6 anim-up d6" style="opacity:0;">
+                <h3 class="font-bold text-base mb-4" style="color:var(--gray-800);">Status Kamar Hari Ini</h3>
+                <div class="space-y-3">
+                    ${[{label:'Tersedia',count:availToday,color:'var(--success)',bg:'#dcfce7',ic:'fa-door-open'},{label:'Terisi (Occupied)',count:occupiedToday,color:'var(--teal-600)',bg:'var(--teal-50)',ic:'fa-door-closed'},{label:'Direservasi',count:activeBk,color:'var(--warning)',bg:'#fef3c7',ic:'fa-clock'}].map(s=>`
+                    <div class="flex items-center gap-4 p-3 rounded-xl" style="background:${s.bg};">
+                        <div class="w-3 h-3 rounded-full flex-shrink-0" style="background:${s.color};"></div>
+                        <div class="flex-1"><div class="text-sm font-semibold" style="color:var(--gray-800);">${s.label}</div></div>
+                        <div class="text-xl font-bold" style="color:${s.color};">${s.count}</div>
+                    </div>`).join('')}
+                </div>
+                <div class="mt-5 pt-5 border-t border-gray-100 flex items-center gap-3"><div class="w-12 h-12 rounded-xl flex items-center justify-center" style="background:linear-gradient(135deg,#f0fdfa,var(--teal-50));"><i class="fas fa-users text-lg" style="color:var(--teal-600);"></i></div><div><div class="text-xl font-bold" style="color:var(--gray-800);">${gs.length}</div><div class="text-xs" style="color:var(--gray-400);">Tamu terdaftar</div></div></div>
+            </div>
+        </div>
+        <div class="mt-8 flex justify-end"><button class="btn-g text-xs" onclick="showModal('Reset Database','<p class=\\'text-sm\\' style=\\'color:var(--gray-600);\\'>Kembalikan semua data ke awal?</p>','<button class=\\'btn-o\\' onclick=\\'closeM()\\'>Batal</button><button class=\\'btn-d\\' onclick=\\'resetDB();closeM()\\'>Reset</button>')"><i class="fas fa-redo mr-1"></i> Reset Database</button></div>`;
+}
+
+
+// ==============================================================
+// ==================== KELOLA KAMAR - CRUD (Sesi 3) =============
+// ==============================================================
+
+function pgRooms(){
+    document.getElementById('aPage').innerHTML=`
+        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
+            <div class="flex flex-wrap items-center gap-3">
+                <div class="relative"><i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm"></i><input type="text" class="ipt py-2 text-sm pl-9" placeholder="Cari kamar..." style="width:220px;" id="srR" oninput="tblRooms()"></div>
+                <select class="ipt py-2 text-sm" style="width:150px;" id="ftR" onchange="tblRooms()"><option value="all">Semua Tipe</option><option value="Standard">Standard</option><option value="Deluxe">Deluxe</option><option value="Suite">Suite</option><option value="Presidential">Presidential</option></select>
+            </div>
+            <button class="btn-t" onclick="frmRoom()"><i class="fas fa-plus"></i> Tambah Kamar</button>
+        </div>
+        <div class="card overflow-hidden anim-up d1" style="opacity:0;"><div class="overflow-x-auto"><table class="dtable"><thead><tr><th>ID</th><th>No. Kamar</th><th>Tipe</th><th>Harga / Malam</th><th>Status Hari Ini</th><th style="text-align:right;">Aksi</th></tr></thead><tbody id="tbR"></tbody></table></div></div>`;
+    tblRooms();
+}
+
+function tblRooms(){
+    const s=(document.getElementById('srR')?.value||'').toLowerCase();
+    const tf=document.getElementById('ftR')?.value||'all';
+    let rooms=gR();
+    if(s)rooms=rooms.filter(r=>r.nomor.includes(s)||r.tipe.toLowerCase().includes(s)||r.id.toLowerCase().includes(s));
+    if(tf!=='all')rooms=rooms.filter(r=>r.tipe===tf);
+    const tb=document.getElementById('tbR');if(!tb)return;
+    const tc={Standard:'#64748b',Deluxe:'#0d9488',Suite:'#7c3aed',Presidential:'#d4a853'};
+    const sl={Available:'b-avail',Occupied:'b-booked',Reserved:'b-cancel'};
+    const lc={Available:'fa-check-circle',Occupied:'fa-user-check',Reserved:'fa-clock'};
+    tb.innerHTML=!rooms.length?`<tr><td colspan="6" class="text-center py-10 text-gray-400"><i class="fas fa-inbox text-3xl mb-2 block"></i>Tidak ada data</td></tr>`:
+        rooms.map(r=>{const ls=roomLiveStatus(r.id);return `<tr><td class="font-mono text-xs" style="color:var(--gray-400);">${r.id}</td><td class="font-bold">${r.nomor}</td><td><span class="inline-flex items-center gap-1.5 text-sm font-semibold" style="color:${tc[r.tipe]};"><i class="fas fa-circle" style="font-size:6px;"></i>${r.tipe}</span></td><td class="font-semibold">${fRp(r.harga)}</td><td><span class="badge ${sl[ls]||'b-avail'}"><i class="fas ${lc[ls]||'fa-circle'} mr-1 text-xs"></i>${ls}</span></td><td style="text-align:right;"><button class="btn-g" onclick="frmRoom('${r.id}')" title="Edit"><i class="fas fa-pen text-xs"></i></button><button class="btn-g" onclick="delRoom('${r.id}')" title="Hapus" style="color:var(--danger);"><i class="fas fa-trash text-xs"></i></button></td></tr>`;}).join('');
+}
+
+function frmRoom(rid=null){
+    const r=rid?rById(rid):null;const isE=!!r;
+    showModal(isE?`Edit Kamar ${r.nomor}`:'Tambah Kamar Baru',`
+        <div class="space-y-4">
+            <div><label class="block text-xs font-semibold mb-1.5" style="color:var(--gray-600);">Nomor Kamar</label><input type="text" id="rfN" class="ipt" placeholder="Contoh: 105" value="${r?r.nomor:''}" ${isE?'readonly style="background:var(--gray-50);"':''}></div>
+            <div><label class="block text-xs font-semibold mb-1.5" style="color:var(--gray-600);">Tipe Kamar</label><select id="rfT" class="ipt"><option value="Standard" ${r?.tipe==='Standard'?'selected':''}>Standard</option><option value="Deluxe" ${r?.tipe==='Deluxe'?'selected':''}>Deluxe</option><option value="Suite" ${r?.tipe==='Suite'?'selected':''}>Suite</option><option value="Presidential" ${r?.tipe==='Presidential'?'selected':''}>Presidential</option></select></div>
+            <div><label class="block text-xs font-semibold mb-1.5" style="color:var(--gray-600);">Harga per Malam (Rp)</label><input type="number" id="rfH" class="ipt" placeholder="750000" value="${r?r.harga:''}" min="0"></div>
+        </div>`,
+    `<button class="btn-o" onclick="closeM()">Batal</button><button class="btn-t" onclick="saveRoom('${rid||''}')"><i class="fas fa-save"></i> ${isE?'Simpan':'Tambah'}</button>`);
+}
+
+function saveRoom(rid){
+    const nomor=document.getElementById('rfN').value.trim(),tipe=document.getElementById('rfT').value,harga=parseInt(document.getElementById('rfH').value);
+    const rooms=gR();
+    if(!nomor){toast('Nomor kamar wajib diisi','error');return;}
+    if(isNaN(harga)||harga<0){toast('Harga tidak valid','error');return;}
+    if(rooms.find(r=>r.nomor===nomor&&r.id!==rid)){toast('Nomor kamar sudah ada','error');return;}
+    if(rid){const i=rooms.findIndex(r=>r.id===rid);rooms[i].tipe=tipe;rooms[i].harga=harga;sR(rooms);toast(`Kamar ${nomor} diperbarui`,'success');}
+    else{rooms.push({id:gid('R'),nomor,tipe,harga,status:'Available',gambar:'teal-new-'+nomor});sR(rooms);toast(`Kamar ${nomor} ditambahkan`,'success');}
+    closeM();tblRooms();
+}
+
+function delRoom(rid){
+    const r=rById(rid);if(!r)return;
+    if(gB().find(b=>b.roomId===rid&&b.status==='Confirmed')){toast(`Kamar ${r.nomor} punya reservasi aktif`,'error');return;}
+    showModal('Hapus Kamar',`<div class="text-center"><div class="w-16 h-16 rounded-full mx-auto flex items-center justify-center mb-4" style="background:#fee2e2;"><i class="fas fa-trash text-2xl" style="color:var(--danger);"></i></div><p class="text-sm" style="color:var(--gray-600);">Hapus <strong>Kamar ${r.nomor}</strong> (${r.tipe})?</p></div>`,
+    `<button class="btn-o" onclick="closeM()">Batal</button><button class="btn-d" onclick="sR(gR().filter(x=>x.id!=='${rid}'));sB(gB().filter(x=>x.roomId!=='${rid}'));closeM();toast('Kamar dihapus','success');tblRooms();"><i class="fas fa-trash mr-1"></i> Hapus</button>`);
+}
+
+
+// ==============================================================
+// ==================== DAFTAR RESERVASI (Sesi 3) ================
+// ==============================================================
+
+const ST_OPTS=['Confirmed','Checked-In','Checked-Out','Canceled'];
+const ST_META={'Confirmed':{badge:'b-conf',icon:'fa-clock',label:'Confirmed'},'Checked-In':{badge:'b-checkin',icon:'fa-sign-in-alt',label:'Checked-In'},'Checked-Out':{badge:'b-checkout',icon:'fa-sign-out-alt',label:'Checked-Out'},Canceled:{badge:'b-cancel',icon:'fa-times-circle',label:'Canceled'}};
+const ST_TRANS={'Confirmed':['Checked-In','Canceled'],'Checked-In':['Checked-Out','Canceled'],'Checked-Out':[],Canceled:['Confirmed']};
+
+function pgBookings(){
+    document.getElementById('aPage').innerHTML=`
+        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
+            <div class="flex flex-wrap items-center gap-3">
+                <div class="relative"><i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm"></i><input type="text" class="ipt py-2 text-sm pl-9" placeholder="Cari ID atau tamu..." style="width:240px;" id="srB" oninput="tblBk()"></div>
+                <select class="ipt py-2 text-sm" style="width:150px;" id="ftB" onchange="tblBk()"><option value="all">Semua Status</option>${ST_OPTS.map(s=>`<option value="${s}">${ST_META[s].label}</option>`).join('')}</select>
+            </div>
+            <button class="btn-o text-sm" onclick="frmBkAdm()"><i class="fas fa-plus"></i> Buat Reservasi</button>
+        </div>
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
+            ${ST_OPTS.map(s=>{const c=gB().filter(b=>b.status===s).length;const m=ST_META[s];return `<div class="card p-4 anim-up" style="opacity:0;"><div class="flex items-center gap-3"><div class="w-9 h-9 rounded-lg flex items-center justify-center" style="background:${s==='Confirmed'?'var(--teal-50)':s==='Checked-In'?'#e0e7ff':s==='Checked-Out'?'#f0fdf4':'#fef3c7'};"><i class="fas ${m.icon} text-sm" style="color:${s==='Confirmed'?'var(--teal-600)':s==='Checked-In'?'#4f46e5':s==='Checked-Out'?'#15803d':'var(--warning)'};"></i></div><div><div class="text-lg font-bold" style="color:var(--gray-800);">${c}</div><div class="text-xs" style="color:var(--gray-400);">${m.label}</div></div></div></div>`;}).join('')}
+        </div>
+        <div class="card overflow-hidden anim-up d2" style="opacity:0;"><div class="overflow-x-auto"><table class="dtable"><thead><tr><th>ID</th><th>Tamu</th><th>Kamar</th><th>Check-in</th><th>Check-out</th><th>Total</th><th>Status</th><th style="text-align:right;">Aksi</th></tr></thead><tbody id="tbB"></tbody></table></div></div>`;
+    tblBk();
+}
+
+function tblBk(){
+    const s=(document.getElementById('srB')?.value||'').toLowerCase();
+    const sf=document.getElementById('ftB')?.value||'all';
+    let bks=gB();
+    if(s)bks=bks.filter(b=>{const g=gById(b.guestId),r=rById(b.roomId);return b.id.toLowerCase().includes(s)||(g&&g.nama.toLowerCase().includes(s))||(r&&r.nomor.includes(s));});
+    if(sf!=='all')bks=bks.filter(b=>b.status===sf);
+    bks.sort((a,b)=>b.id.localeCompare(a.id));
+    const tb=document.getElementById('tbB');if(!tb)return;
+    tb.innerHTML=!bks.length?`<tr><td colspan="8" class="text-center py-10 text-gray-400"><i class="fas fa-calendar-times text-3xl mb-2 block"></i>Tidak ada data</td></tr>`:
+        bks.map(b=>{
+            const g=gById(b.guestId),r=rById(b.roomId),m=nM(b.checkIn,b.checkOut);
+            const sm=ST_META[b.status];const opts=ST_TRANS[b.status]||[];
+            const bc={Confirmed:'#93c5fd','Checked-In':'#a5b4fc','Checked-Out':'#86efac',Canceled:'#fcd34d'};
+            return `<tr>
+                <td class="font-mono text-xs font-semibold" style="color:var(--teal-700);">${b.id}</td>
+                <td><div class="text-sm font-semibold">${g?g.nama:'<span class="text-gray-400">Dihapus</span>'}</div>${g?`<div class="text-xs text-gray-400">${g.email}</div>`:''}</td>
+                <td><div class="text-sm font-semibold">${r?'No. '+r.nomor:'?'}</div>${r?`<div class="text-xs text-gray-400">${r.tipe}</div>`:''}</td>
+                <td class="text-sm">${fDt(b.checkIn)}</td>
+                <td class="text-sm">${fDt(b.checkOut)} <span class="text-xs text-gray-400">(${m})</span></td>
+                <td class="font-semibold text-sm">${fRp(b.totalBiaya)}</td>
+                <td>${opts.length>0?`<select class="status-select" style="border-color:${bc[b.status]||'#cbd5e1'};" onchange="chgStatus('${b.id}',this.value)">${ST_OPTS.map(so=>`<option value="${so}" ${so===b.status?'selected':''} ${!opts.includes(so)&&so!==b.status?'disabled':''}>${ST_META[so].label}</option>`).join('')}</select>`:`<span class="badge ${sm.badge}"><i class="fas ${sm.icon} mr-1 text-xs"></i>${sm.label}</span>`}</td>
+                <td style="text-align:right;"><button class="btn-g" onclick="viewBk('${b.id}')" title="Detail"><i class="fas fa-eye text-xs"></i></button><button class="btn-g" onclick="delBk('${b.id}')" title="Hapus" style="color:var(--danger);"><i class="fas fa-trash text-xs"></i></button></td>
+            </tr>`;}).join('');
+}
+
+function chgStatus(bid,newSt){
+    const b=bById(bid);if(!b)return;const oldSt=b.status;
+    const labels={'Confirmed':'Confirmed',Canceled:'Dibatalkan','Checked-In':'Check-In','Checked-Out':'Check-Out'};
+    if(oldSt==='Confirmed'&&newSt==='Checked-In'){const ls=roomLiveStatus(b.roomId);if(ls==='Occupied'){toast(`Kamar ${rById(b.roomId)?.nomor||''} sedang terisi`,'error');tblBk();return;}}
+    if(oldSt==='Canceled'&&newSt==='Confirmed'){if(!isAvail(b.roomId,b.checkIn,b.checkOut)){toast('Kamar tidak tersedia di tanggal tersebut','error');tblBk();return;}}
+    showModal('Ubah Status Reservasi',`<div class="text-center"><div class="w-16 h-16 rounded-full mx-auto flex items-center justify-center mb-4" style="background:${newSt==='Canceled'?'#fee2e2':newSt==='Checked-In'?'#e0e7ff':'var(--teal-50)'};"><i class="fas ${ST_META[newSt].icon} text-2xl" style="color:${newSt==='Canceled'?'var(--danger)':newSt==='Checked-In'?'#4f46e5':'var(--teal-600)'};"></i></div><p class="text-sm" style="color:var(--gray-600);">Ubah <strong>${bid}</strong> dari <strong>${labels[oldSt]}</strong> menjadi <strong>${labels[newSt]}</strong>?</p></div>`,
+    `<button class="btn-o" onclick="tblBk();closeM()">Batal</button><button class="${newSt==='Canceled'?'btn-d':'btn-t'}" onclick="execChgSt('${bid}','${newSt}')"><i class="fas fa-check mr-1"></i> Konfirmasi</button>`);
+}
+
+function execChgSt(bid,newSt){
+    let bks=gB();const i=bks.findIndex(b=>b.id===bid);if(i===-1)return;
+    bks[i].status=newSt;sB(bks);closeM();toast(`Status ${bid} diubah ke ${ST_META[newSt].label}`,'success');tblBk();
+}
+
+function viewBk(bid){
+    const b=bById(bid);if(!b)return;const g=gById(b.guestId),r=rById(b.roomId),m=nM(b.checkIn,b.checkOut);const sm=ST_META[b.status];
+    showModal(`Detail ${b.id}`,`<div class="space-y-4"><div class="grid grid-cols-2 gap-4"><div class="p-4 rounded-xl" style="background:var(--gray-50);"><div class="text-xs font-semibold mb-1" style="color:var(--gray-400);">ID Reservasi</div><div class="font-mono font-bold" style="color:var(--teal-700);">${b.id}</div></div><div class="p-4 rounded-xl" style="background:var(--gray-50);"><div class="text-xs font-semibold mb-1" style="color:var(--gray-400);">Status</div><span class="badge ${sm.badge}"><i class="fas ${sm.icon} mr-1 text-xs"></i>${sm.label}</span></div></div><div class="p-4 rounded-xl" style="background:var(--teal-50);border:1px solid var(--teal-100);"><div class="text-xs font-semibold mb-2" style="color:var(--teal-600);">Data Tamu</div><div class="font-bold" style="color:var(--gray-800);">${g?g.nama:'-'}</div><div class="text-sm mt-1" style="color:var(--gray-600);">${g?g.email:''} — ${g?g.telepon:''}</div></div><div class="p-4 rounded-xl" style="background:var(--gray-50);border:1px solid var(--gray-200);"><div class="text-xs font-semibold mb-2" style="color:var(--gray-500);">Detail</div><div class="grid grid-cols-2 gap-3 text-sm"><div><span style="color:var(--gray-400);">Kamar:</span> <strong>${r?'No. '+r.nomor+' — '+r.tipe:'-'}</strong></div><div><span style="color:var(--gray-400);">Durasi:</span> <strong>${m} malam</strong></div><div><span style="color:var(--gray-400);">Check-in:</span> <strong>${fDt(b.checkIn)}</strong></div><div><span style="color:var(--gray-400);">Total:</span> <strong style="color:var(--teal-700);">${fRp(b.totalBiaya)}</strong></div></div></div></div>`,
+    `<button class="btn-o" onclick="closeM()">Tutup</button>`);
+}
+
+function delBk(bid){
+    showModal('Hapus Reservasi',`<div class="text-center"><div class="w-16 h-16 rounded-full mx-auto flex items-center justify-center mb-4" style="background:#fee2e2;"><i class="fas fa-trash text-2xl" style="color:var(--danger);"></i></div><p class="text-sm" style="color:var(--gray-600);">Hapus <strong>${bid}</strong>?</p></div>`,
+    `<button class="btn-o" onclick="closeM()">Batal</button><button class="btn-d" onclick="sB(gB().filter(x=>x.id!=='${bid}'));closeM();toast('Dihapus','success');tblBk();"><i class="fas fa-trash mr-1"></i> Hapus</button>`);
+}
+
+function frmBkAdm(){
+    const avail=gR(),guests=gG();const t=new Date();t.setDate(t.getDate()+1);const ta=new Date();ta.setDate(ta.getDate()+2);
+    showModal('Buat Reservasi',`<div class="space-y-4"><div><label class="block text-xs font-semibold mb-1.5" style="color:var(--gray-600);">Tamu</label><select id="abG" class="ipt"><option value="">-- Pilih --</option>${guests.map(g=>`<option value="${g.id}">${g.nama}</option>`).join('')}</select></div><div><label class="block text-xs font-semibold mb-1.5" style="color:var(--gray-600);">Kamar</label><select id="abR" class="ipt" onchange="admCalc()"><option value="">-- Pilih --</option>${avail.map(r=>`<option value="${r.id}">No. ${r.nomor} — ${r.tipe} (${fRp(r.harga)})</option>`).join('')}</select></div><div class="grid grid-cols-2 gap-3"><div><label class="block text-xs font-semibold mb-1.5" style="color:var(--gray-600);">Check-in</label><input type="date" id="abCI" class="ipt" min="${t.toISOString().split('T')[0]}" value="${t.toISOString().split('T')[0]}" onchange="admCalc()"></div><div><label class="block text-xs font-semibold mb-1.5" style="color:var(--gray-600);">Check-out</label><input type="date" id="abCO" class="ipt" min="${ta.toISOString().split('T')[0]}" value="${ta.toISOString().split('T')[0]}" onchange="admCalc()"></div></div><div class="p-4 rounded-xl" style="background:var(--teal-50);border:1px solid var(--teal-100);"><div class="flex justify-between"><span class="text-sm" style="color:var(--gray-500);">Total</span><span class="font-bold text-lg" style="color:var(--teal-700);" id="abTot">Rp 0</span></div></div></div>`,
+    `<button class="btn-o" onclick="closeM()">Batal</button><button class="btn-t" onclick="submitBkAdm()"><i class="fas fa-check"></i> Buat</button>`);
+}
+function admCalc(){const rid=document.getElementById('abR').value,ci=document.getElementById('abCI').value,co=document.getElementById('abCO').value;if(rid&&ci&&co){const r=rById(rid);if(r)document.getElementById('abTot').textContent=fRp(r.harga*nM(ci,co));}}
+function submitBkAdm(){
+    const gid=document.getElementById('abG').value,rid=document.getElementById('abR').value,ci=document.getElementById('abCI').value,co=document.getElementById('abCO').value;
+    if(!gid){toast('Pilih tamu','error');return;}if(!rid){toast('Pilih kamar','error');return;}if(!ci||!co){toast('Isi tanggal','error');return;}
+    if(new Date(co)<=new Date(ci)){toast('Check-out harus setelah check-in','error');return;}
+    if(!isAvail(rid,ci,co)){toast('Kamar tidak tersedia','error');return;}
+    const r=rById(rid),m=nM(ci,co),tot=r.harga*m;
+    const bks=gB();bks.push({id:gid('BK'),roomId:rid,guestId:gid,checkIn:ci,checkOut:co,totalBiaya:tot,status:'Confirmed'});sB(bks);
+    closeM();toast(`Reservasi dibuat! ${fRp(tot)}`,'success');tblBk();
+}
+
+
+// ==============================================================
+// ==================== DATA TAMU ================================
+// ==============================================================
+
+function pgGuests(){
+    document.getElementById('aPage').innerHTML=`
+        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
+            <div class="relative"><i class="fas fa-search absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm"></i><input type="text" class="ipt py-2 text-sm pl-9" placeholder="Cari nama, email..." style="width:280px;" id="srG" oninput="tblG()"></div>
+            <button class="btn-t" onclick="frmGuest()"><i class="fas fa-user-plus"></i> Tambah Tamu</button>
+        </div>
+        <div class="card overflow-hidden anim-up d1" style="opacity:0;"><div class="overflow-x-auto"><table class="dtable"><thead><tr><th>ID</th><th>Nama</th><th>Email</th><th>Telepon</th><th>Reservasi</th><th style="text-align:right;">Aksi</th></tr></thead><tbody id="tbG"></tbody></table></div></div>`;
+    tblG();
+}
+
+function tblG(){
+    const s=(document.getElementById('srG')?.value||'').toLowerCase();let gs=gG();const bks=gB();
+    if(s)gs=gs.filter(g=>g.nama.toLowerCase().includes(s)||g.email.toLowerCase().includes(s)||g.telepon.includes(s));
+    const tb=document.getElementById('tbG');if(!tb)return;
+    tb.innerHTML=!gs.length?`<tr><td colspan="6" class="text-center py-10 text-gray-400"><i class="fas fa-user-slash text-3xl mb-2 block"></i>Tidak ada data</td></tr>`:
+        gs.map(g=>{const c=bks.filter(b=>b.guestId===g.id).length;return `<tr><td class="font-mono text-xs" style="color:var(--gray-400);">${g.id}</td><td><div class="flex items-center gap-3"><div class="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 text-xs font-bold text-white" style="background:linear-gradient(135deg,var(--teal-500),var(--teal-400));">${g.nama.charAt(0)}</div><span class="font-semibold">${g.nama}</span></div></td><td class="text-sm">${g.email}</td><td class="text-sm">${g.telepon}</td><td><span class="inline-flex items-center justify-center w-7 h-7 rounded-lg text-xs font-bold" style="background:var(--teal-50);color:var(--teal-700);">${c}</span></td><td style="text-align:right;"><button class="btn-g" onclick="frmGuest('${g.id}')"><i class="fas fa-pen text-xs"></i></button><button class="btn-g" onclick="delGuest('${g.id}')" style="color:var(--danger);"><i class="fas fa-trash text-xs"></i></button></td></tr>`;}).join('');
+}
+
+function frmGuest(gid=null){
+    const g=gid?gById(gid):null;const isE=!!g;
+    showModal(isE?'Edit Tamu':'Tambah Tamu',`<div class="space-y-4"><div><label class="block text-xs font-semibold mb-1.5" style="color:var(--gray-600);">Nama Lengkap</label><input type="text" id="gfN" class="ipt" value="${g?g.nama:''}"></div><div><label class="block text-xs font-semibold mb-1.5" style="color:var(--gray-600);">Email</label><input type="email" id="gfE" class="ipt" value="${g?g.email:''}"></div><div><label class="block text-xs font-semibold mb-1.5" style="color:var(--gray-600);">Telepon</label><input type="tel" id="gfT" class="ipt" value="${g?g.telepon:''}"></div></div>`,
+    `<button class="btn-o" onclick="closeM()">Batal</button><button class="btn-t" onclick="saveGuest('${gid||''}')"><i class="fas fa-save"></i> ${isE?'Simpan':'Tambah'}</button>`);
+}
+
+function saveGuest(gid){
+    const n=document.getElementById('gfN').value.trim(),e=document.getElementById('gfE').value.trim(),t=document.getElementById('gfT').value.trim();
+    const gs=gG();
+    if(!n){toast('Nama wajib diisi','error');return;}if(!e||!e.includes('@')){toast('Email tidak valid','error');return;}if(!t){toast('Telepon wajib diisi','error');return;}
+    if(gs.find(g=>g.email===e&&g.id!==gid)){toast('Email sudah terdaftar','error');return;}
+    if(gid){const i=gs.findIndex(g=>g.id===gid);gs[i]={...gs[i],nama:n,email:e,telepon:t};sG(gs);toast('Data tamu diperbarui','success');}
+    else{gs.push({id:gid('G'),nama:n,email:e,telepon:t});sG(gs);toast('Tamu ditambahkan','success');}
+    closeM();tblG();
+}
+
+function delGuest(gid){
+    const g=gById(gid);if(!g)return;
+    if(gB().find(b=>b.guestId===gid&&b.status==='Confirmed')){toast(`${g.nama} punya reservasi aktif`,'error');return;}
+    showModal('Hapus Tamu',`<div class="text-center"><div class="w-16 h-16 rounded-full mx-auto flex items-center justify-center mb-4" style="background:#fee2e2;"><i class="fas fa-user-minus text-2xl" style="color:var(--danger);"></i></div><p class="text-sm" style="color:var(--gray-600);">Hapus <strong>${g.nama}</strong>?</p></div>`,
+    `<button class="btn-o" onclick="closeM()">Batal</button><button class="btn-d" onclick="sG(gG().filter(x=>x.id!=='${gid}'));sB(gB().filter(x=>x.guestId!=='${gid}'));closeM();toast('Dihapus','success');tblG();"><i class="fas fa-trash mr-1"></i> Hapus</button>`);
+}
+
+
+// ==============================================================
+// ==================== INISIALISASI =============================
+// ==============================================================
+
+document.addEventListener('DOMContentLoaded',()=>{
+    initDB();
+    initDates();
+    animStat();
+});
+</script>
+</body>
+</html>
